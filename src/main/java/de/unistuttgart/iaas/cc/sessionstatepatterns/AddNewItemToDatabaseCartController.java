@@ -4,8 +4,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import de.unistuttgart.iaas.cc.sessionstatepatterns.DAO.ShoppingCartDaoLocal;
-
 @Controller
 public class AddNewItemToDatabaseCartController {
 

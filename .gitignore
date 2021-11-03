@@ -25,3 +25,4 @@
 /.nb-gradle/
 
 aws.properties
+docker/dynamodb/shared-local-instance.db

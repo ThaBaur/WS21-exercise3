@@ -1,4 +1,4 @@
-package de.unistuttgart.iaas.cc.sessionstatepatterns.DAO;
+package de.unistuttgart.iaas.cc.sessionstatepatterns;
 
 import java.util.List;
 

@@ -1,11 +1,10 @@
-package de.unistuttgart.iaas.cc.sessionstatepatterns.DAO;
+package de.unistuttgart.iaas.cc.sessionstatepatterns;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
@@ -17,11 +16,9 @@ import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
 import com.amazonaws.services.dynamodbv2.model.KeyType;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
+import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
 import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.amazonaws.services.dynamodbv2.model.ScanResult;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ShoppingCartDaoLocal implements ShoppingCartDao {
     
@@ -29,28 +26,27 @@ public class ShoppingCartDaoLocal implements ShoppingCartDao {
     
     private static final String TABLE_NAME = "shopping-cart";
     private static final String ENDPOINT = "http://localhost:8000";
-    private static final Regions REGION = Regions.EU_CENTRAL_1;
+    private static final String REGION = "eu-central-1";
 
     private final AmazonDynamoDB client;
     private Table table;
 
-    private final static Logger logger = LoggerFactory.getLogger(ShoppingCartDaoLocal.class);
-
     public ShoppingCartDaoLocal() {
         this.client = AmazonDynamoDBAsyncClientBuilder.standard()
-            .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(ENDPOINT, REGION.name()))
+            .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(ENDPOINT, REGION))
             .build();
         DynamoDB db = new DynamoDB(this.client);
         try {
             table = db.getTable(TABLE_NAME);
+            System.out.println("Table exists: " + table.getTableName());
         } catch (Exception e) {
-            createTable(db);    
+            createTable(db);
         }
     }
 
     private void createTable(DynamoDB db) {
         List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
-        attributeDefinitions.add(new AttributeDefinition().withAttributeName("element"));
+        attributeDefinitions.add(new AttributeDefinition().withAttributeName("element").withAttributeType(ScalarAttributeType.S));
 
         List<KeySchemaElement> keySchema = new ArrayList<>();
         keySchema.add(new KeySchemaElement().withAttributeName("element").withKeyType(KeyType.HASH));
@@ -65,9 +61,10 @@ public class ShoppingCartDaoLocal implements ShoppingCartDao {
 
         try {
             table.waitForActive();
-            logger.info("Table created");
+            System.out.println("Table created");
         } catch(InterruptedException e) {
-            logger.error("Table creation got interruppted", e);
+            System.out.println("Table creation got interruppted");
+            System.out.println(e.getLocalizedMessage());
         }
     }
 
@@ -77,6 +74,7 @@ public class ShoppingCartDaoLocal implements ShoppingCartDao {
 
     @Override
     public List<String> getAllShoppingCartItems() {
+        System.out.println("Load Shopping Cart Items");
         List<String> result = new ArrayList<>();
         ScanRequest scan = new ScanRequest().withTableName(TABLE_NAME);
         ScanResult scanResult = client.scan(scan);
@@ -89,9 +87,10 @@ public class ShoppingCartDaoLocal implements ShoppingCartDao {
 
     @Override
     public void addShoppingCartItem(String item) {
+        System.out.println("Put Shopping Cart Items");
         this.table.putItem(
             new Item().withPrimaryKey("element", item)
-        );   
+        );
     }
     
 }
