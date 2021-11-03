@@ -4,21 +4,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.unistuttgart.iaas.cc.sessionstatepatterns.DAO.ShoppingCartDaoLocal;
+
+import java.util.List;
 
 @Controller
 public class IndexController {
 
-
-	private final static Logger logger = LoggerFactory.getLogger(IndexController.class);
-
 	@RequestMapping("/")
 	public String hello(Model model) {
 
-	    // TODO: Task 4 - Request database for content of cart
-
-		model.addAttribute("cart", "this is the content");
+		List<String> shoppingCart = ShoppingCartDaoLocal.getShoppingCart().getAllShoppingCartItems();
+		
+		model.addAttribute("cart", shoppingCart);
 		return "index";
 	}
 }
