@@ -1,5 +1,11 @@
 <%
-    // TODO: Task 5 - Set cookies from parameter
+    String itemToAdd = request.getParameter("item");
+    if (itemToAdd != null && itemToAdd != "") {
+        Cookie items = new Cookie(itemToAdd, itemToAdd);
+        items.setMaxAge(60*60*24);
+        response.addCookie(items);
+    }
+    response.sendRedirect("/");
 %>
 
 <html>
